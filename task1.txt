@@ -1,0 +1,51 @@
+#1
+
+SELECT TOP 5 SUM(Payments.amount), Acquirers.bank_acquirer
+FROM Payments
+INNER JOIN Acquirers
+ON Paymets.merchant_id=Acquirers.merchant_id
+WHERE Payments.order_status = 'success'
+GROUP BY Acquirers.bank_acquirer
+ORDER BY SUM(Payments.amount) DESC;
+
+#3
+
+SELECT TOP 3 BIN_info.card_country, 
+COUNT(CASE WHEN Payments.order_status = 'success' then 1 ELSE NULL END)/count(Payments.order_status)*100 AS Percent_success,
+SUM(CASE WHEN Payments.order_status = 'success' then Payments.amount ELSE 0 END) AS Income
+FROM Payments
+INNER JOIN BIN_info
+ON Paymets.bin=BIN_info.bin
+GROUP BY BIN_info.card_country
+ORDER BY Income DESC;
+
+#4
+
+SELECT BIN_info.bank_emitent, 
+SUM(CASE WHEN Payments.order_status = 'success' then Payments.amount ELSE 0 END) AS Income
+FROM Payments
+INNER JOIN BIN_info
+ON Paymets.bin=BIN_info.bin
+WHERE Payments.ts > DATEADD(month, -1, GETDATE())
+GROUP BY BIN_info.bank_emitent
+HAVING Income > 100000
+ORDER BY Income DESC;
+
+#5
+
+SELECT Payments.user_id, BIN_info.bank_emitent, BIN_info.card_country,
+first_value(COUNT(Chb.order_id))
+OVER (PARTITION BY BIN_info.bank_emitent ORDER BY COUNT(Chb.order_id) DESC ROWS BETWEEN 5 FOLLOWING ) as CHARGEBACK_NUM
+FROM Payments
+INNER JOIN BIN_info
+ON Paymets.bin=BIN_info.bin
+INNER JOIN Chb
+ON Paymets.order_id=C.order_id
+WHERE Payments.ts >= Convert(datetime, '2022-1-1' )
+
+
+
+
+
+
+  
