@@ -41,7 +41,7 @@ INNER JOIN BIN_info
 ON Paymets.bin=BIN_info.bin
 INNER JOIN Chb
 ON Paymets.order_id=C.order_id
-WHERE Payments.ts >= Convert(datetime, '2022-1-1' )
+WHERE Payments.ts >= Convert(datetime, '2022-1-1' );
 
 
 
